@@ -1,38 +1,182 @@
-# PDF Tools
+# Image & PDF Utility Scripts
 
-A small collection of simple Python command-line utilities for working with PDFs.
+A small collection of **command-line Python utilities** for working with images, PDFs, and Word documents.
 
-Currently included:
+These scripts are designed to be **simple, composable tools** that solve common document-processing tasks such as:
 
-- **merge_pdfs.py** — combine multiple PDF files into a single PDF
-- **images_to_pdf.py** — convert multiple image files into a multi-page PDF
+- Converting image collections to **PDF**
+- Converting image collections to **Word (.docx)**
+- Creating **labeled PDFs from images**
+- **Merging** PDFs
+- **Splitting PDFs by maximum file size**
 
-These scripts are designed to be lightweight and easy to use from the command line.
+Each script is **standalone** and can be used independently.
+
+---
+
+# Features
+
+- Simple **CLI-based utilities**
+- Works with **JPG, PNG, and other common image formats**
+- Supports **Unicode filenames** (including Mandarin and other non-Latin scripts)
+- Automatically scales images to fit document pages
+- Lightweight dependencies
+- Designed for **batch processing**
 
 ---
 
 # Requirements
 
-Python 3.8+
+Python **3.9+** recommended.
 
 Install dependencies:
 
 ```bash
-pip install pypdf pillow
+pip install pillow python-docx pypdf
 ```
 
-Libraries used:
+Dependencies used:
 
-- `pypdf` — reading and writing PDF files
-- `Pillow` — image processing and conversion
+| Library | Purpose |
+|-------|-------|
+| Pillow | Image processing |
+| python-docx | Word document generation |
+| pypdf | PDF manipulation |
 
 ---
 
-# Tools
+# Installation
 
-## 1. Merge PDFs
+Clone the repository:
 
-`merge_pdfs.py` combines multiple PDF files (including multi-page PDFs) into a single output file.
+```bash
+git clone https://github.com/yourname/image-pdf-tools.git
+cd image-pdf-tools
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Or manually:
+
+```bash
+pip install pillow python-docx pypdf
+```
+
+---
+
+# Scripts Overview
+
+| Script | Description |
+|------|------|
+| `images2docx.py` | Convert images into a Word document |
+| `images2pdf.py` | Convert images into a simple PDF |
+| `images2pdf_labeled.py` | Convert images to PDF with filename headers and page numbers |
+| `merge_pdfs.py` | Merge multiple PDFs |
+| `split_pdf_maxsize.py` | Split a PDF into parts below a maximum file size |
+
+---
+
+# images2docx.py
+
+Convert images into a **Word document (.docx)**.
+
+Features:
+
+- Filename becomes a **heading above each image**
+- Images automatically **scaled to fit the page**
+- Supports **multiple images per page**
+- Handles **Unicode filenames**
+
+### Usage
+
+```bash
+python images2docx.py output.docx image1.jpg image2.png image3.jpg
+```
+
+Specify number of images per page:
+
+```bash
+python images2docx.py output.docx image1.jpg image2.jpg image3.jpg 2
+```
+
+Example:
+
+```bash
+python images2docx.py photos.docx *.jpg
+```
+
+---
+
+# images2pdf.py
+
+Create a **PDF from images**, with **one image per page**.
+
+Transparent images (e.g. PNG) are automatically converted to RGB.
+
+### Usage
+
+```bash
+python images2pdf.py output.pdf image1.jpg image2.png image3.jpg
+```
+
+Example:
+
+```bash
+python images2pdf.py gallery.pdf *.png
+```
+
+---
+
+# images2pdf_labeled.py
+
+Create a PDF where each page contains:
+
+- A **header with the image filename**
+- A **page number**
+- The **image centered below the header**
+
+Images are slightly resized to create space for the header.
+
+### Header Layout
+
+```
+--------------------------------
+|  filename label     page #   |
+--------------------------------
+|                              |
+|           image              |
+|                              |
+```
+
+Supports Unicode labels (useful for multilingual filenames).
+
+### Usage
+
+```bash
+python images2pdf_labeled.py output.pdf image1.jpg image2.jpg
+```
+
+Specify starting page number:
+
+```bash
+python images2pdf_labeled.py output.pdf image1.jpg image2.jpg 50
+```
+
+Example:
+
+```bash
+python images2pdf_labeled.py slides.pdf slide1.png slide2.png slide3.png
+```
+
+---
+
+# merge_pdfs.py
+
+Merge multiple PDFs into a single file.
 
 ### Usage
 
@@ -40,74 +184,162 @@ Libraries used:
 python merge_pdfs.py output.pdf file1.pdf file2.pdf file3.pdf
 ```
 
-### Example
+Example:
 
 ```bash
-python merge_pdfs.py combined.pdf chapter1.pdf chapter2.pdf appendix.pdf
+python merge_pdfs.py combined.pdf chapter1.pdf chapter2.pdf chapter3.pdf
 ```
-
-The resulting file will contain all pages from the input PDFs in the order provided.
-
-### Features
-
-- Works with **multi-page PDFs**
-- Preserves page order
-- No recompression or quality loss
-- Simple command-line interface
 
 ---
 
-## 2. Convert Images to a Multi-Page PDF
+# split_pdf_maxsize.py
 
-`images_to_pdf.py` converts multiple bitmap images into a single multi-page PDF.
+Split a PDF into multiple files so that each output file remains under a specified **maximum size**.
 
-Supported formats include:
+Default limit:
 
-- JPG / JPEG
-- PNG
-- BMP
-- TIFF
-- Other formats supported by Pillow
+```
+15 MB
+```
+
+Output files are named automatically:
+
+```
+document_part1.pdf
+document_part2.pdf
+document_part3.pdf
+```
 
 ### Usage
 
-```bash
-python images_to_pdf.py output.pdf image1.jpg image2.png image3.jpg
-```
-
-### Example
+Default size limit:
 
 ```bash
-python images_to_pdf.py document.pdf page1.jpg page2.jpg page3.png
+python split_pdf_maxsize.py input.pdf
 ```
 
-Each image becomes one page in the resulting PDF.
+Specify custom maximum size (MB):
 
-### Features
+```bash
+python split_pdf_maxsize.py input.pdf 10
+```
 
-- Supports multiple image formats
-- Handles PNG transparency automatically
-- Maintains original image resolution
-- Creates multi-page PDFs
+Example:
+
+```bash
+python split_pdf_maxsize.py large_file.pdf 20
+```
 
 ---
 
-# Example Workflow
+# Batch Processing Tips
 
-Convert scanned pages to a PDF:
-
-```bash
-python images_to_pdf.py scans.pdf scan1.jpg scan2.jpg scan3.jpg
-```
-
-Merge the result with another document:
+### Process all images in a directory
 
 ```bash
-python merge_pdfs.py final_document.pdf cover.pdf scans.pdf appendix.pdf
+python images2pdf.py output.pdf *.jpg
 ```
+
+### Sort images before processing
+
+```bash
+ls *.jpg | sort | xargs python images2pdf.py output.pdf
+```
+
+### Combine generated PDFs
+
+```bash
+python merge_pdfs.py final.pdf part1.pdf part2.pdf part3.pdf
+```
+
+---
+
+# Unicode Filename Support
+
+All scripts support **Unicode filenames**, including:
+
+```
+第01頁.jpg
+圖像02.png
+пример.png
+imagen.jpg
+```
+
+This works both for:
+
+- file input
+- automatically generated labels
+
+---
+
+# Font Configuration (Optional)
+
+`images2pdf_labeled.py` uses a font to render header labels.
+
+Default path:
+
+```
+/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
+```
+
+If this font is unavailable, the script falls back to the default PIL font.
+
+To customize:
+
+```python
+FONT_PATH = "/path/to/your/font.ttf"
+```
+
+---
+
+# Performance Notes
+
+For very large image sets:
+
+- Use glob expansion (`*.jpg`) or shell scripts
+- Process images in batches if needed
+- Ensure sufficient RAM when handling high-resolution images
+
+---
+
+# Example Workflow Ideas
+
+These utilities can be combined for flexible document processing.
+
+Example tasks include:
+
+- Converting image scans to PDFs
+- Creating labeled PDF collections
+- Preparing image sets for sharing
+- Combining multiple PDF outputs
+- Splitting large PDFs to meet upload limits
 
 ---
 
 # License
 
 MIT License
+
+---
+
+# Contributions
+
+Pull requests and improvements are welcome.
+
+Possible future improvements:
+
+- automatic image sorting
+- PDF compression options
+- drag-and-drop GUI wrapper
+- recursive directory processing
+- watermarking support
+
+---
+
+# Acknowledgements
+
+Built using excellent open source libraries:
+
+- Pillow  
+- python-docx  
+- pypdf
